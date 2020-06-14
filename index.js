@@ -32,7 +32,7 @@ async function checkEmailExists(emailId) {
 }
 
 app.get("/checkEmail/:email", (req, res) => {
-  checkEmailExists(req.params.username).then(result => {
+  checkEmailExists(req.params.email).then(result => {
     const response = {
       output: result ? "Username already exists" : "Username doesnt exist"
     };
