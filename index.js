@@ -4,8 +4,7 @@ const mongo = require("mongoose");
 
 app.use(cors());
 
-const uri =
-  "mongodb+srv://admin:admin@cluster0-acs6q.mongodb.net/online_poll?retryWrites=true&w=majority";
+const uri = `mongodb+srv://${process.env.USERNAME}:${process.env.PASSWORD}@cluster0-acs6q.mongodb.net/online_poll?retryWrites=true&w=majority`;
 mongo
   .connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log("Connected to mongodb..."))
@@ -34,7 +33,7 @@ async function checkEmailExists(emailId) {
 app.get("/checkEmail/:email", (req, res) => {
   checkEmailExists(req.params.email).then(result => {
     const response = {
-      output: result ? "Username already exists" : "Username doesnt exist"
+      output: result ? "Email already exists" : "Email doesnt exist"
     };
     res.send(response);
   });
