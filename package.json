@@ -2,10 +2,10 @@
   "name": "QuickPollServer",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
     "build": "rm -rf dist && webpack --mode development",
-    "start": "node index.js"
+    "start": "node app.js"
   },
   "keywords": [],
   "author": "",
@@ -15,7 +15,8 @@
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "mongodb": "^3.5.8",
-    "mongoose": "^5.9.18"
+    "mongoose": "^5.9.18",
+    "raven-js": "^3.27.2"
   },
   "devDependencies": {
     "@babel/core": "^7.10.2",
