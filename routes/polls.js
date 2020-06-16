@@ -11,4 +11,9 @@ router.get("/viewPublicPolls", (_, res) => {
   });
 });
 
+router.get("/getPollQuestion/:id", (req, res) => {
+  const id = req.params.id;
+  db.getPollQuestion(id).then(result => res.send(result));
+});
+
 module.exports = router;

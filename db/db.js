@@ -45,7 +45,7 @@ async function checkEmailExists(emailId) {
     email: { $regex: emailId, $options: "i" }
   });
   console.log(result);
-  if (result.length > 0) return true;
+  if (result) return true;
   return false;
 }
 
@@ -57,11 +57,11 @@ async function checkEmailExists(emailId) {
  * Validating the sign in credentials
  */
 async function validateForSignIn(emailId, password) {
-  const result = await Users.find({
+  const result = await Users.findOne({
     email: emailId,
     password: password
   });
-  if (result && result.length > 0) return result[0].name;
+  if (result) return result.name;
   return null;
 }
 
@@ -97,10 +97,30 @@ async function fetchAllPolls() {
     //text polls
     const filteredTextPolls = result.filter(p => p.poll_type === "text");
     for (let polls of filteredTextPolls) {
-      const textPolls = await TextPolls.find({ _id: polls.reference_id });
-      allPolls.push(textPolls[0]);
+      const textPolls = await TextPolls.findOne({ _id: polls.reference_id });
+      allPolls.push(textPolls);
     }
     return allPolls;
+  } catch (err) {
+    console.log(err.message);
+  }
+}
+
+/**
+ *
+ * Fetch the poll questions and options based on the id
+ * @param {*} pollId
+ */
+async function getPollQuestion(pollId) {
+  let pollObj = {};
+  try {
+    const result = await Polls.findOne({ reference_id: pollId });
+    if (result && result.poll_type === "text") {
+      pollObj = await TextPolls.findOne({ _id: result.reference_id });
+    } else if (result && result.poll_type === "image") {
+      //Code for handling image polls
+    }
+    return pollObj;
   } catch (err) {
     console.log(err.message);
   }
@@ -110,5 +130,6 @@ module.exports = {
   checkEmailExists,
   validateForSignIn,
   createNewAccount,
-  fetchAllPolls
+  fetchAllPolls,
+  getPollQuestion
 };
