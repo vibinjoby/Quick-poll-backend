@@ -1,0 +1,6 @@
+each polls in pollquestion
+    .card
+        img.card-img-top(src='/assets/images/polls-grid.png', alt='Card image cap')
+        .card-body
+            p.card-text= polls.question
+        button.join-poll-btn(onclick='navigateToPoll(' + polls._id + ')') POLL NOW
