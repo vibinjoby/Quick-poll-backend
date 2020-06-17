@@ -18,7 +18,8 @@ const usersSchema = new mongo.Schema({
 const pollsSchema = new mongo.Schema({
   id: String,
   poll_type: String,
-  reference_id: String
+  reference_id: String,
+  created_by: String
 });
 
 const textPollsSchema = new mongo.Schema({
@@ -32,8 +33,6 @@ const Polls = mongo.model("Polls", pollsSchema);
 const Users = mongo.model("Users", usersSchema);
 
 const TextPolls = mongo.model("Text_Polls", textPollsSchema);
-
-console.log("DB initialized!!!");
 
 /**
  *
@@ -126,10 +125,39 @@ async function getPollQuestion(pollId) {
   }
 }
 
+async function getUserPolls(userId) {
+  let pollsObj = [];
+  try {
+    const polls = await Polls.find({
+      created_by: userId
+    });
+
+    for (let poll of polls) {
+      //image poll to be added later
+      poll.poll_type === "text"
+        ? pollsObj.push(await fetchTextPolls(poll.reference_id))
+        : "";
+    }
+    return pollsObj;
+  } catch (err) {
+    console.log(err.message);
+  }
+}
+
+async function fetchTextPolls(textId) {
+  try {
+    const textPolls = TextPolls.findById(textId);
+    return textPolls;
+  } catch (err) {
+    console.log(err.message);
+  }
+}
+
 module.exports = {
   checkEmailExists,
   validateForSignIn,
   createNewAccount,
   fetchAllPolls,
-  getPollQuestion
+  getPollQuestion,
+  getUserPolls
 };

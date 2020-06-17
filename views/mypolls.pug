@@ -1,0 +1,8 @@
+each poll in mypolls
+    .card
+        .card-header
+            #nay.circletag
+                img.card-img-top(src='/assets/images/logo_large.png', alt='Card image cap')
+        .card-body
+            p.card-text= poll.question
+        button.join-poll-btn(onclick='navigateToPoll(\'' + poll._id + '\')') POLL NOW
