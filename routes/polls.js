@@ -17,7 +17,8 @@ router.get("/getPollQuestion/:id", (req, res) => {
 
 router.get("/getMyPolls/:userId", (req, res) => {
   db.getUserPolls(req.params.userId).then(result => {
-    res.render("mypolls", { mypolls: result });
+    //For testing added noOfVotes --> once implementation is done will be removed
+    res.render("mypolls", { mypolls: result, noOfVotes: "No Votes" });
   });
 });
 

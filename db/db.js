@@ -125,6 +125,10 @@ async function getPollQuestion(pollId) {
   }
 }
 
+/**
+ *
+ * @param {*} userId
+ */
 async function getUserPolls(userId) {
   let pollsObj = [];
   try {
@@ -144,6 +148,10 @@ async function getUserPolls(userId) {
   }
 }
 
+/**
+ *
+ * @param {*} textId
+ */
 async function fetchTextPolls(textId) {
   try {
     const textPolls = TextPolls.findById(textId);
