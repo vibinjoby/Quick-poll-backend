@@ -12,8 +12,14 @@ router.get("/checkEmail/:email", (req, res) => {
 });
 
 router.post("/createAccount", (req, res) => {
-  res.send({ output: "Account created successfully!!" });
-  db.createNewAccount(req.body);
+  try {
+    db.createNewAccount(req.body).then(() => {
+      res.send({ output: "Account created successfully!!" });
+    });
+  } catch (err) {
+    console.log(err.message);
+    res.status(500).send("Something went wrong in the server");
+  }
 });
 
 module.exports = router;

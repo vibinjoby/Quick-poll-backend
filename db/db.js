@@ -1,4 +1,5 @@
 const mongo = require("mongoose");
+const bcrypt = require("bcrypt");
 
 // prod-mode
 const uri = `mongodb+srv://${process.env.USERNAME}:${process.env.PASSWORD}@cluster0-acs6q.mongodb.net/online_poll?retryWrites=true&w=majority`;
@@ -56,11 +57,16 @@ async function checkEmailExists(emailId) {
  * Validating the sign in credentials
  */
 async function validateForSignIn(emailId, password) {
-  const result = await Users.findOne({
-    email: emailId,
-    password: password
+  let result = await Users.findOne({
+    email: emailId
   });
-  if (result) return result.name;
+  if (result) {
+    const isAuthPassword = await bcrypt.compare(password, result.password);
+    if (isAuthPassword) {
+      result.password = undefined;
+      return JSON.stringify(result);
+    }
+  }
   return null;
 }
 
@@ -70,20 +76,18 @@ async function validateForSignIn(emailId, password) {
  * Saving the user details for signing up
  */
 async function createNewAccount(body) {
-  try {
-    const { name, email, password } = body;
-    const users = await Users.create({
-      name,
-      email,
-      password
-    });
+  const { name, email, password } = body;
+  const salt = await bcrypt.genSalt(10);
+  const hashedPwd = await bcrypt.hash(password, salt);
+  const users = await Users.create({
+    name,
+    email,
+    password: hashedPwd
+  });
 
-    await users.validate();
+  await users.validate();
 
-    await users.save();
-  } catch (ex) {
-    console.log(ex.message);
-  }
+  await users.save();
 }
 
 /**
