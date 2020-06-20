@@ -22,7 +22,9 @@ router.get("/getMyPolls", auth, (req, res) => {
   const decodedUserObj = jwtDecode(token);
   db.getUserPolls(decodedUserObj._id).then(result => {
     //For testing added noOfVotes --> once implementation is done will be removed
-    res.render("mypolls", { mypolls: result, noOfVotes: "No Votes" });
+    result.length > 0
+      ? res.render("mypolls", { mypolls: result, noOfVotes: "No Votes" })
+      : res.render("nopolls");
   });
 });
 
