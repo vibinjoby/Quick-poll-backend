@@ -2,7 +2,7 @@ each poll in mypolls
     .card
         .delete-container
             a(data-toggle="modal" data-target="#deleteModal")
-                img#delete-img(src='assets/images/trash.png', alt='delete image')
+                img#delete-img(src='assets/images/trash.png', alt='delete image', onclick='updateDeletePollId(\'' + poll._id + '\')')
         .card-header
             #nay.circletag
                 img.card-img-top(src='/assets/images/logo_large.png', alt='Card image cap')

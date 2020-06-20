@@ -95,18 +95,14 @@ async function createNewAccount(body) {
  */
 async function fetchAllPolls() {
   let allPolls = [];
-  try {
-    const result = await Polls.find();
-    //text polls
-    const filteredTextPolls = result.filter(p => p.poll_type === "text");
-    for (let polls of filteredTextPolls) {
-      const textPolls = await TextPolls.findOne({ _id: polls.reference_id });
-      allPolls.push(textPolls);
-    }
-    return allPolls;
-  } catch (err) {
-    console.log(err.message);
+  const result = await Polls.find();
+  //text polls
+  const filteredTextPolls = result.filter(p => p.poll_type === "text");
+  for (let polls of filteredTextPolls) {
+    const textPolls = await TextPolls.findOne({ _id: polls.reference_id });
+    allPolls.push(textPolls);
   }
+  return allPolls;
 }
 
 /**
@@ -116,17 +112,13 @@ async function fetchAllPolls() {
  */
 async function getPollQuestion(pollId) {
   let pollObj = {};
-  try {
-    const result = await Polls.findOne({ reference_id: pollId });
-    if (result && result.poll_type === "text") {
-      pollObj = await TextPolls.findOne({ _id: result.reference_id });
-    } else if (result && result.poll_type === "image") {
-      //Code for handling image polls
-    }
-    return pollObj;
-  } catch (err) {
-    console.log(err.message);
+  const result = await Polls.findOne({ reference_id: pollId });
+  if (result && result.poll_type === "text") {
+    pollObj = await TextPolls.findOne({ _id: result.reference_id });
+  } else if (result && result.poll_type === "image") {
+    //Code for handling image polls
   }
+  return pollObj;
 }
 
 /**
@@ -135,21 +127,17 @@ async function getPollQuestion(pollId) {
  */
 async function getUserPolls(userId) {
   let pollsObj = [];
-  try {
-    const polls = await Polls.find({
-      created_by: userId
-    });
+  const polls = await Polls.find({
+    created_by: userId
+  });
 
-    for (let poll of polls) {
-      //image poll to be added later
-      poll.poll_type === "text"
-        ? pollsObj.push(await fetchTextPolls(poll.reference_id))
-        : "";
-    }
-    return pollsObj;
-  } catch (err) {
-    console.log(err.message);
+  for (let poll of polls) {
+    //image poll to be added later
+    poll.poll_type === "text"
+      ? pollsObj.push(await fetchTextPolls(poll.reference_id))
+      : "";
   }
+  return pollsObj;
 }
 
 /**
@@ -157,12 +145,23 @@ async function getUserPolls(userId) {
  * @param {*} textId
  */
 async function fetchTextPolls(textId) {
-  try {
-    const textPolls = TextPolls.findById(textId);
-    return textPolls;
-  } catch (err) {
-    console.log(err.message);
+  const textPolls = TextPolls.findById(textId);
+  return textPolls;
+}
+
+async function deletePoll(pollId) {
+  let polls = [];
+  const result = await Polls.findOne({ reference_id: pollId });
+
+  // Delete the initial poll reference
+  await Polls.findOneAndDelete(pollId);
+  if (result && result.poll_type === "text") {
+    // Then delete the corresponding poll
+    polls = await TextPolls.findOneAndDelete(result.reference_id);
+  } else if (result && result.poll_type === "image") {
+    // Code for handling image polls
   }
+  return polls;
 }
 
 module.exports = {
@@ -171,5 +170,6 @@ module.exports = {
   createNewAccount,
   fetchAllPolls,
   getPollQuestion,
-  getUserPolls
+  getUserPolls,
+  deletePoll
 };
