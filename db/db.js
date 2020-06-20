@@ -77,7 +77,9 @@ async function validateForSignIn(emailId, password) {
  */
 async function createNewAccount(body) {
   const { name, email, password } = body;
+  //Generate salt for hashing
   const salt = await bcrypt.genSalt(10);
+  // Hash the password before saving to DB
   const hashedPwd = await bcrypt.hash(password, salt);
   const users = await Users.create({
     name,
@@ -161,6 +163,7 @@ async function deletePoll(pollId) {
   } else if (result && result.poll_type === "image") {
     // Code for handling image polls
   }
+  console.log(polls);
   return polls;
 }
 
