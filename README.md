@@ -19,7 +19,7 @@ request parameter needed --> email
 
 body params needed --> emailId, password
 
-== PROTECTED ROUTES == (Works only with x-auth-token in the header section)
+== ##PROTECTED ROUTES == (Works only with x-auth-token in the header section)
 
 4. GET /polls/viewPublicPolls
 
