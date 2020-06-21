@@ -9,31 +9,11 @@ mongo
   .then(() => console.log("Connected to mongodb..."))
   .catch(err => console.log("Unable to connnect to mongodb", err));
 
-const usersSchema = new mongo.Schema({
-  name: String,
-  email: String,
-  password: String,
-  create_date: Date
-});
-
-const pollsSchema = new mongo.Schema({
-  id: String,
-  poll_type: String,
-  reference_id: String,
-  created_by: String
-});
-
-const textPollsSchema = new mongo.Schema({
-  id: String,
-  question: String,
-  options: Object
-});
-
-const Polls = mongo.model("Polls", pollsSchema);
-
-const Users = mongo.model("Users", usersSchema);
-
-const TextPolls = mongo.model("Text_Polls", textPollsSchema);
+// Load the models
+const Polls = require("../models/polls");
+const Users = require("../models/users");
+const TextPolls = require("../models/textpoll");
+const ImagePolls = require("../models/imagepoll");
 
 /**
  *

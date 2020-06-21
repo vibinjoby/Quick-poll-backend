@@ -7,6 +7,7 @@ var bodyParser = require("body-parser");
 const signup = require("./routes/signup");
 const signin = require("./routes/login");
 const polls = require("./routes/polls");
+const createPolls = require("./routes/createPolls");
 
 //templating engine
 app.set("view engine", "pug");
@@ -25,5 +26,6 @@ app.use(bodyParser.json());
 app.use("/signup", signup);
 app.use("/signin", signin);
 app.use("/polls", polls);
+app.use("/create-polls", createPolls);
 
 app.listen(process.env.PORT || 5000);
