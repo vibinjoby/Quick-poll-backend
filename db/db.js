@@ -79,14 +79,27 @@ async function createNewAccount(body) {
  */
 async function fetchAllPolls() {
   let allPolls = [];
-  const result = await Polls.find();
-  //text polls
-  const filteredTextPolls = result.filter(p => p.poll_type === "text");
-  for (let polls of filteredTextPolls) {
-    const textPolls = await TextPolls.findOne({ _id: polls.reference_id });
-    allPolls.push(textPolls);
-  }
-  return allPolls;
+  const polls = await Polls.find({ is_private: false });
+
+  // Get the individual poll from their collection based on the id
+  return Promise.all(
+    polls.map(async poll => {
+      if (poll.poll_type === "text") {
+        console.log("polls.reference_id", poll.reference_id);
+        let textPolls = await TextPolls.findById(poll.reference_id);
+        // add a attribute to differentiate the poll type
+        textPolls.poll_type = "text";
+        console.log(textPolls);
+        allPolls.push(textPolls);
+      } else {
+        let imagePolls = await ImagePolls.findById(poll.reference_id);
+        imagePolls.poll_type = "image";
+        console.log(imagePolls);
+        allPolls.push(imagePolls);
+      }
+      return allPolls;
+    })
+  );
 }
 
 /**
@@ -110,18 +123,28 @@ async function getPollQuestion(pollId) {
  * @param {*} userId
  */
 async function getUserPolls(userId) {
-  let pollsObj = [];
+  let myPolls = [];
   const polls = await Polls.find({
     created_by: userId
   });
 
-  for (let poll of polls) {
-    //image poll to be added later
-    poll.poll_type === "text"
-      ? pollsObj.push(await fetchTextPolls(poll.reference_id))
-      : "";
-  }
-  return pollsObj;
+  return Promise.all(
+    polls.map(async poll => {
+      if (poll.poll_type === "text") {
+        let textPolls = await TextPolls.findById(poll.reference_id);
+        textPolls.no_of_votes = poll.no_of_votes ? poll.no_of_votes : 0;
+        // add a attribute to differentiate the poll type
+        textPolls.poll_type = "text";
+        myPolls.push(textPolls);
+      } else {
+        let imagePolls = await ImagePolls.findById(poll.reference_id);
+        imagePolls.no_of_votes = poll.no_of_votes ? poll.no_of_votes : 0;
+        imagePolls.poll_type = "image";
+        myPolls.push(imagePolls);
+      }
+      return myPolls;
+    })
+  );
 }
 
 /**
@@ -191,7 +214,8 @@ async function createPoll(pollType, imagePollsOutput, userId) {
   const polls = await Polls.create({
     poll_type: pollType,
     reference_id: imagePollsOutput._id,
-    created_by: userId
+    created_by: userId,
+    is_private: false
   });
   const pollsOutput = await polls.save();
   console.log(`Entry created in polls collection with id ${pollsOutput._id}`);

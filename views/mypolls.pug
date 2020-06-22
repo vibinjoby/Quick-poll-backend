@@ -7,7 +7,7 @@ each poll in mypolls
             #nay.circletag
                 img.card-img-top(src='/assets/images/logo_large.png', alt='Card image cap')
             .votes-container
-                p= noOfVotes
+                p= poll.no_of_votes
         .card-body
             p.card-text= poll.question
         button.join-poll-btn(onclick='navigateToPoll(\'' + poll._id + '\')') POLL NOW

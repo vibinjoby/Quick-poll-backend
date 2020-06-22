@@ -8,12 +8,13 @@ router.get("/viewPublicPolls", auth, (_, res) => {
   db.fetchAllPolls()
     .then(result => {
       res.render("polls", {
-        pollquestion: result
+        pollquestion: result[0]
       });
     })
-    .catch(err =>
-      res.status(500).send(`Something went wrong in the server ${err.message}`)
-    );
+    .catch(err => {
+      console.log(err);
+      res.status(500).send(`Something went wrong in the server ${err.message}`);
+    });
 });
 
 router.get("/getPollQuestion/:id", auth, (req, res) => {
@@ -30,9 +31,8 @@ router.get("/getMyPolls", auth, (req, res) => {
   const decodedUserObj = jwtDecode(token);
   db.getUserPolls(decodedUserObj._id)
     .then(result => {
-      //For testing added noOfVotes --> once implementation is done will be removed
       result.length > 0
-        ? res.render("mypolls", { mypolls: result, noOfVotes: "No Votes" })
+        ? res.render("mypolls", { mypolls: result[0] })
         : res.render("nopolls");
     })
     .catch(err =>
