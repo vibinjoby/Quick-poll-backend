@@ -45,3 +45,23 @@ request params needed --> id of the poll question
 
 return JSON response of the deleted object
 
+8. POST /create-polls/textPoll
+
+body params needed --> question as text, options as array
+
+returns JSON response of the collection object created in mongo DB
+
+9. POST /create-polls/imagePoll
+
+##scenario-1:
+
+When the question is an image and the options are text
+
+form data params needed --> question with image, is_question_image as Y, options_text as String with comma seperated
+
+##scenario-2:
+
+When the question is a text and the options are images
+
+form data params needed --> question as string, is_options_image as Y, options as images
+
