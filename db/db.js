@@ -2,6 +2,8 @@ const mongo = require("mongoose");
 const bcrypt = require("bcrypt");
 
 // prod-mode
+//${process.env.USERNAME}
+//${process.env.PASSWORD}
 const uri = `mongodb+srv://${process.env.USERNAME}:${process.env.PASSWORD}@cluster0-acs6q.mongodb.net/online_poll?retryWrites=true&w=majority`;
 
 mongo
@@ -131,6 +133,10 @@ async function fetchTextPolls(textId) {
   return textPolls;
 }
 
+/**
+ * Function to delete a poll based on the poll id parameter
+ * @param {*} pollId
+ */
 async function deletePoll(pollId) {
   let polls = [];
   const result = await Polls.findOne({ reference_id: pollId });
@@ -147,6 +153,94 @@ async function deletePoll(pollId) {
   return polls;
 }
 
+/**
+ * Function to save Image polls when the question is an image
+ * @param {*} userId
+ * @param {*} questionsUrl
+ * @param {*} options_text
+ */
+async function addPollQuestionImg(userId, questionsUrl, options_text) {
+  const is_question_image = "Y";
+
+  const options_text_obj = options_text.split(",").reduce((acc, cur, i) => {
+    acc[i + 1] = cur;
+    return acc;
+  }, {});
+
+  const imagePolls = await ImagePolls.create({
+    is_question_image,
+    question_img_url: questionsUrl,
+    options_text: options_text_obj
+  });
+
+  await imagePolls.validate();
+
+  const imagePollsOutput = await imagePolls.save();
+
+  // Create an entry in Polls Collection with the id from image poll as reference
+  createPoll("image", imagePollsOutput, userId);
+}
+
+/**
+ * Function to create entry in polls collection after creating a new poll
+ * @param {*} pollType
+ * @param {*} imagePollsOutput
+ * @param {*} userId
+ */
+async function createPoll(pollType, imagePollsOutput, userId) {
+  const polls = await Polls.create({
+    poll_type: pollType,
+    reference_id: imagePollsOutput._id,
+    created_by: userId
+  });
+  const pollsOutput = await polls.save();
+  console.log(`Entry created in polls collection with id ${pollsOutput._id}`);
+}
+
+/**
+ * Function to save image polls when options is an image
+ * @param {*} userId
+ * @param {*} optionsUrl
+ * @param {*} question_text
+ */
+async function addPollOptionsImg(userId, optionsUrl, question_text) {
+  const is_options_image = "Y";
+
+  const options_img_urls = optionsUrl.reduce((acc, cur, i) => {
+    acc[i + 1] = cur;
+    return acc;
+  }, {});
+
+  const imagePolls = await ImagePolls.create({
+    is_options_image,
+    question_text,
+    options_img_urls
+  });
+
+  const imagePollsOutput = await imagePolls.save();
+
+  // Create an entry in Polls Collection with the id from image poll as reference
+  createPoll("image", imagePollsOutput, userId);
+}
+
+async function createTextPoll(userId, questionsText, optionsArr) {
+  const optionsObj = optionsArr.reduce((acc, cur, i) => {
+    acc[i + 1] = cur;
+    return acc;
+  }, {});
+  const textPoll = await TextPolls.create({
+    question: questionsText,
+    options: optionsObj
+  });
+
+  const textPollsOutput = await textPoll.save();
+
+  // Create an entry in Polls Collection with the id from image poll as reference
+  createPoll("text", textPollsOutput, userId);
+
+  return textPollsOutput;
+}
+
 module.exports = {
   checkEmailExists,
   validateForSignIn,
@@ -154,5 +248,8 @@ module.exports = {
   fetchAllPolls,
   getPollQuestion,
   getUserPolls,
-  deletePoll
+  deletePoll,
+  addPollQuestionImg,
+  addPollOptionsImg,
+  createTextPoll
 };
