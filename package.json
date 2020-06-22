@@ -4,7 +4,6 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "build": "rm -rf dist && webpack --mode development",
     "start": "node app.js"
   },
   "keywords": [],
