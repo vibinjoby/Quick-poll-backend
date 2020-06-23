@@ -65,3 +65,15 @@ When the question is a text and the options are images
 
 form data params needed --> question as string, is_options_image as Y, options as images
 
+10. POST /polls/vote
+
+body params needed --> pollId, optionChosen
+
+returns Vote Registered string
+
+11. GET /polls/viewResult/:id
+
+request params needed --> id of the poll 
+
+returns JSON response with the percentage of votes per each option
+
