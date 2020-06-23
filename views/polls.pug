@@ -4,10 +4,10 @@ each polls in pollquestion
             img.card-img-top(src= polls.question_img_url, alt='Card image cap')
         else 
             img.card-img-top(src='/assets/images/polls-grid.png', alt='Card image cap')
-        if poll.question_text || poll.question
+        if polls.question_text || polls.question
             .card-body
-                if poll.question_text
-                    p.card-text= poll.question_text
+                if polls.question_text
+                    p.card-text= polls.question_text
                 else
-                    p.card-text= poll.question
+                    p.card-text= polls.question
         button.join-poll-btn(onclick='navigateToPoll(\'' + polls._id + '\')') POLL NOW
