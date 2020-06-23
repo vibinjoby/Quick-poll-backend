@@ -132,16 +132,12 @@ async function getUserPolls(userId) {
         textPolls.no_of_votes = poll.poll_results.no_of_votes
           ? poll.poll_results.no_of_votes
           : 0;
-        // add a attribute to differentiate the poll type
-        textPolls.poll_type = "text";
         myPolls.push(textPolls);
       } else {
         let imagePolls = await ImagePolls.findById(poll.reference_id);
         imagePolls.no_of_votes = poll.poll_results.no_of_votes
           ? poll.poll_results.no_of_votes
           : 0;
-        // add a attribute to differentiate the poll type
-        imagePolls.poll_type = "image";
         myPolls.push(imagePolls);
       }
       return myPolls;
@@ -210,8 +206,9 @@ async function createPoll(pollType, pollsOutput, userId) {
       If the poll type is image and if the is_options_image is not present then get keys from options_text
       If the poll type is not image then it is text and hence get the keys from options 
     */
+
   Object.keys(
-    pollType.poll_type === "image"
+    pollType === "image"
       ? pollsOutput.is_options_image
         ? pollsOutput.options_img_urls
         : pollsOutput.options_text

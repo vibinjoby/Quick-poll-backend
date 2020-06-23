@@ -31,6 +31,7 @@ router.get("/getMyPolls", auth, (req, res) => {
   const decodedUserObj = jwtDecode(token);
   db.getUserPolls(decodedUserObj._id)
     .then(result => {
+      console.log(result[0]);
       result.length > 0
         ? res.render("mypolls", { mypolls: result[0] })
         : res.render("nopolls");
