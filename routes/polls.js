@@ -49,4 +49,43 @@ router.delete("/deletePoll/:id", auth, (req, res) => {
     );
 });
 
+router.post("/vote", auth, (req, res) => {
+  if (!req.body || !req.body.pollId || !req.body.optionChosen)
+    return res
+      .status(400)
+      .send(
+        "Incorrect request sent to server missing pollId / optionChosen attribute"
+      );
+  const { pollId, optionChosen } = req.body;
+  db.voteForPoll(pollId, optionChosen)
+    .then(() => res.send("Vote registered"))
+    .catch(err => {
+      console.log(err);
+      res
+        .status(500)
+        .send(`Something went wrong with the server ${err.message}`);
+    });
+});
+
+router.get("/viewResult/:id", auth, (req, res) => {
+  //call the db and get the no of votes per options
+  db.fetchVoteResults(req.params.id).then(result => {
+    let finalResult = {};
+    const totalVotes = result.no_of_votes;
+    const promiseOutput = Promise.all(
+      Object.keys(result.votes_per_options).map(options => {
+        const votes = result.votes_per_options[options];
+        console.log(votes);
+        //calculate the percentage of votes per each option and round off
+        finalResult[options] =
+          votes > 0 ? Math.ceil((votes / totalVotes) * 100) : 0;
+        return finalResult;
+      })
+    );
+    promiseOutput.then(data => {
+      res.send(data[0]);
+    });
+  });
+});
+
 module.exports = router;

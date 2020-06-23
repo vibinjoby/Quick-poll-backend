@@ -26,7 +26,6 @@ async function checkEmailExists(emailId) {
   const result = await Users.find({
     email: { $regex: emailId, $options: "i" }
   });
-  console.log(result);
   if (result) return true;
   return false;
 }
@@ -85,16 +84,13 @@ async function fetchAllPolls() {
   return Promise.all(
     polls.map(async poll => {
       if (poll.poll_type === "text") {
-        console.log("polls.reference_id", poll.reference_id);
         let textPolls = await TextPolls.findById(poll.reference_id);
         // add a attribute to differentiate the poll type
         textPolls.poll_type = "text";
-        console.log(textPolls);
         allPolls.push(textPolls);
       } else {
         let imagePolls = await ImagePolls.findById(poll.reference_id);
         imagePolls.poll_type = "image";
-        console.log(imagePolls);
         allPolls.push(imagePolls);
       }
       return allPolls;
@@ -114,12 +110,13 @@ async function getPollQuestion(pollId) {
     pollObj = await TextPolls.findOne({ _id: result.reference_id });
   } else if (result && result.poll_type === "image") {
     //Code for handling image polls
+    // :- TO-DO
   }
   return pollObj;
 }
 
 /**
- *
+ * Function to get my polls
  * @param {*} userId
  */
 async function getUserPolls(userId) {
@@ -132,28 +129,24 @@ async function getUserPolls(userId) {
     polls.map(async poll => {
       if (poll.poll_type === "text") {
         let textPolls = await TextPolls.findById(poll.reference_id);
-        textPolls.no_of_votes = poll.no_of_votes ? poll.no_of_votes : 0;
+        textPolls.no_of_votes = poll.poll_results.no_of_votes
+          ? poll.poll_results.no_of_votes
+          : 0;
         // add a attribute to differentiate the poll type
         textPolls.poll_type = "text";
         myPolls.push(textPolls);
       } else {
         let imagePolls = await ImagePolls.findById(poll.reference_id);
-        imagePolls.no_of_votes = poll.no_of_votes ? poll.no_of_votes : 0;
+        imagePolls.no_of_votes = poll.poll_results.no_of_votes
+          ? poll.poll_results.no_of_votes
+          : 0;
+        // add a attribute to differentiate the poll type
         imagePolls.poll_type = "image";
         myPolls.push(imagePolls);
       }
       return myPolls;
     })
   );
-}
-
-/**
- *
- * @param {*} textId
- */
-async function fetchTextPolls(textId) {
-  const textPolls = TextPolls.findById(textId);
-  return textPolls;
 }
 
 /**
@@ -210,15 +203,35 @@ async function addPollQuestionImg(userId, questionsUrl, options_text) {
  * @param {*} imagePollsOutput
  * @param {*} userId
  */
-async function createPoll(pollType, imagePollsOutput, userId) {
+async function createPoll(pollType, pollsOutput, userId) {
+  let votes_per_options = {};
+  /** Assign the votes per options default as 0
+      If the poll type is image and if the is_options_image is present then get keys from options_img_urls
+      If the poll type is image and if the is_options_image is not present then get keys from options_text
+      If the poll type is not image then it is text and hence get the keys from options 
+    */
+  Object.keys(
+    pollType.poll_type === "image"
+      ? pollsOutput.is_options_image
+        ? pollsOutput.options_img_urls
+        : pollsOutput.options_text
+      : pollsOutput.options
+  ).forEach(keys => {
+    votes_per_options[keys] = 0;
+  });
+
   const polls = await Polls.create({
     poll_type: pollType,
-    reference_id: imagePollsOutput._id,
+    reference_id: pollsOutput._id,
     created_by: userId,
-    is_private: false
+    is_private: false,
+    poll_results: {
+      no_of_votes: 0,
+      votes_per_options
+    }
   });
-  const pollsOutput = await polls.save();
-  console.log(`Entry created in polls collection with id ${pollsOutput._id}`);
+  const pollsResult = await polls.save();
+  console.log(`Entry created in polls collection with id ${pollsResult._id}`);
 }
 
 /**
@@ -229,6 +242,8 @@ async function createPoll(pollType, imagePollsOutput, userId) {
  */
 async function addPollOptionsImg(userId, optionsUrl, question_text) {
   const is_options_image = "Y";
+
+  console.log("inside");
 
   const options_img_urls = optionsUrl.reduce((acc, cur, i) => {
     acc[i + 1] = cur;
@@ -247,6 +262,12 @@ async function addPollOptionsImg(userId, optionsUrl, question_text) {
   createPoll("image", imagePollsOutput, userId);
 }
 
+/**
+ * Function to create text poll
+ * @param {*} userId
+ * @param {*} questionsText
+ * @param {*} optionsArr
+ */
 async function createTextPoll(userId, questionsText, optionsArr) {
   const optionsObj = optionsArr.reduce((acc, cur, i) => {
     acc[i + 1] = cur;
@@ -264,6 +285,25 @@ async function createTextPoll(userId, questionsText, optionsArr) {
 
   return textPollsOutput;
 }
+/**
+ * Function to vote for a poll
+ * @param {*} pollId
+ * @param {*} optionChosen
+ */
+async function voteForPoll(pollId, optionChosen) {
+  //Increment the no_of_votes and votes_per_options count
+  const pollData = await Polls.findById(pollId);
+  pollData.poll_results.no_of_votes += 1;
+  pollData.poll_results.votes_per_options[optionChosen] += 1;
+  pollData.markModified("poll_results");
+
+  await pollData.save();
+}
+
+async function fetchVoteResults(id) {
+  const pollData = await Polls.findById(id);
+  return pollData.poll_results;
+}
 
 module.exports = {
   checkEmailExists,
@@ -275,5 +315,7 @@ module.exports = {
   deletePoll,
   addPollQuestionImg,
   addPollOptionsImg,
-  createTextPoll
+  createTextPoll,
+  voteForPoll,
+  fetchVoteResults
 };
