@@ -110,7 +110,7 @@ async function getPollQuestion(pollId) {
     pollObj = await TextPolls.findOne({ _id: result.reference_id });
   } else if (result && result.poll_type === "image") {
     //Code for handling image polls
-    // :- TO-DO
+    pollObj = await ImagePolls.findOne({ _id: result.reference_id });
   }
   return pollObj;
 }
@@ -160,6 +160,7 @@ async function deletePoll(pollId) {
     polls = await TextPolls.findOneAndDelete(result.reference_id);
   } else if (result && result.poll_type === "image") {
     // Code for handling image polls
+    polls = await ImagePolls.findOneAndDelete(result.reference_id);
   }
   console.log(polls);
   return polls;
