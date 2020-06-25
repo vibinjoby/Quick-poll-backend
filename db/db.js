@@ -226,7 +226,7 @@ async function createPoll(pollType, pollsOutput, userId, is_private) {
     poll_type: pollType,
     reference_id: pollsOutput._id,
     created_by: userId,
-    is_private: is_private && is_private === "true",
+    is_private: is_private && is_private === "true" ? true : false,
     poll_results: {
       no_of_votes: 0,
       votes_per_options
