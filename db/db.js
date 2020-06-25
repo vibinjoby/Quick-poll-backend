@@ -171,7 +171,12 @@ async function deletePoll(pollId) {
  * @param {*} questionsUrl
  * @param {*} options_text
  */
-async function addPollQuestionImg(userId, questionsUrl, options_text) {
+async function addPollQuestionImg(
+  userId,
+  questionsUrl,
+  options_text,
+  is_private
+) {
   const is_question_image = "Y";
 
   const options_text_obj = options_text.split(",").reduce((acc, cur, i) => {
@@ -190,7 +195,7 @@ async function addPollQuestionImg(userId, questionsUrl, options_text) {
   const imagePollsOutput = await imagePolls.save();
 
   // Create an entry in Polls Collection with the id from image poll as reference
-  createPoll("image", imagePollsOutput, userId);
+  createPoll("image", imagePollsOutput, userId, is_private);
 }
 
 /**
@@ -199,7 +204,7 @@ async function addPollQuestionImg(userId, questionsUrl, options_text) {
  * @param {*} imagePollsOutput
  * @param {*} userId
  */
-async function createPoll(pollType, pollsOutput, userId) {
+async function createPoll(pollType, pollsOutput, userId, is_private) {
   let votes_per_options = {};
   /** Assign the votes per options default as 0
       If the poll type is image and if the is_options_image is present then get keys from options_img_urls
@@ -221,7 +226,7 @@ async function createPoll(pollType, pollsOutput, userId) {
     poll_type: pollType,
     reference_id: pollsOutput._id,
     created_by: userId,
-    is_private: false,
+    is_private: is_private && is_private === "true",
     poll_results: {
       no_of_votes: 0,
       votes_per_options
@@ -237,7 +242,13 @@ async function createPoll(pollType, pollsOutput, userId) {
  * @param {*} optionsUrl
  * @param {*} question_text
  */
-async function addPollOptionsImg(userId, optionsUrl, question_text) {
+async function addPollOptionsImg(
+  userId,
+  optionsUrl,
+  question_text,
+  options_text,
+  is_private
+) {
   const is_options_image = "Y";
 
   const options_img_urls = optionsUrl.reduce((acc, cur, i) => {
@@ -248,13 +259,14 @@ async function addPollOptionsImg(userId, optionsUrl, question_text) {
   const imagePolls = await ImagePolls.create({
     is_options_image,
     question_text,
-    options_img_urls
+    options_img_urls,
+    options_text
   });
 
   const imagePollsOutput = await imagePolls.save();
 
   // Create an entry in Polls Collection with the id from image poll as reference
-  createPoll("image", imagePollsOutput, userId);
+  createPoll("image", imagePollsOutput, userId, is_private);
 }
 
 /**
@@ -263,7 +275,7 @@ async function addPollOptionsImg(userId, optionsUrl, question_text) {
  * @param {*} questionsText
  * @param {*} optionsArr
  */
-async function createTextPoll(userId, questionsText, optionsArr) {
+async function createTextPoll(userId, questionsText, optionsArr, is_private) {
   const optionsObj = optionsArr.reduce((acc, cur, i) => {
     acc[i + 1] = cur;
     return acc;
@@ -276,7 +288,7 @@ async function createTextPoll(userId, questionsText, optionsArr) {
   const textPollsOutput = await textPoll.save();
 
   // Create an entry in Polls Collection with the id from image poll as reference
-  createPoll("text", textPollsOutput, userId);
+  createPoll("text", textPollsOutput, userId, is_private);
 
   return textPollsOutput;
 }

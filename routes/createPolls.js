@@ -32,7 +32,8 @@ router.post(
         is_question_image,
         question_text,
         is_options_image,
-        options_text
+        options_text,
+        is_private
       } = req.body;
 
       //If question is an image then the options are text
@@ -44,10 +45,23 @@ router.post(
         }
         //If options is an image then the question is text
       } else if (is_options_image && is_options_image.toUpperCase() === "Y") {
-        if (!question_text) {
+        if (!question_text || !options_text) {
           return res
             .status(400)
-            .send("question_text not sent in body when options is an image");
+            .send(
+              "question_text/options_text not sent in body when options is an image"
+            );
+        } else {
+          // Check if the number of options images from the request matches the number of options in text
+          const options_text_obj = options_text.split(",");
+
+          if (options_text_obj.length !== req.files.options.length) {
+            return res
+              .status(400)
+              .send(
+                "number of options in text is not equal to number of options image sent"
+              );
+          }
         }
       } else {
         return res
@@ -78,7 +92,8 @@ router.post(
         question_text,
         options_text,
         questionsUrl,
-        optionsUrl
+        optionsUrl,
+        is_private
       );
       res.send("File uploaded successfully!!");
     } catch (err) {
@@ -106,7 +121,8 @@ const uploadImage = async (
   question_text,
   options_text,
   questionsUrl,
-  optionsUrl
+  optionsUrl,
+  is_private
 ) => {
   AWS.config.update({
     //process.env.AWS_ACCESS_KEY_ID
@@ -149,9 +165,15 @@ const uploadImage = async (
   // Once the file is uploaded to AWS-S3 Bucket resolve the promise to see the url values and save it to DB
   Promise.all(result).then(() => {
     if (is_question_image)
-      db.addPollQuestionImg(userId, questionsUrl, options_text);
+      db.addPollQuestionImg(userId, questionsUrl, options_text, is_private);
     if (is_options_image)
-      db.addPollOptionsImg(userId, optionsUrl, question_text);
+      db.addPollOptionsImg(
+        userId,
+        optionsUrl,
+        question_text,
+        options_text,
+        is_private
+      );
   });
 };
 
@@ -161,13 +183,15 @@ router.post("/textPoll", auth, (req, res) => {
     if (!req.body || !req.body.options || !req.body.question)
       return res.status(400).send("Invalid request sent to server");
 
-    const { question, options } = req.body;
+    const { question, options, is_private } = req.body;
     const token = req.header("x-auth-token");
     const decodedUserObj = jwtDecode(token);
     const userId = decodedUserObj._id;
 
     //Save the text poll and send the saved object in the collection as response
-    db.createTextPoll(userId, question, options).then(data => res.send(data));
+    db.createTextPoll(userId, question, options, is_private).then(data =>
+      res.send(data)
+    );
   } catch (err) {
     console.log(err.message);
     res.status(500).send(`Something went wrong in the server ${err.message}`);
