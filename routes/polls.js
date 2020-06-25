@@ -46,7 +46,13 @@ router.get("/getMyPolls", auth, (req, res) => {
 router.delete("/deletePoll/:id", auth, (req, res) => {
   const id = req.params.id;
   db.deletePoll(id)
-    .then(result => res.send(result))
+    .then(result => {
+      result && res.send(result);
+      !result &&
+        res.send(
+          "No such poll present..Either the poll is deleted or the id is incorrect"
+        );
+    })
     .catch(err =>
       res.status(500).send(`Something went wrong in the server ${err.message}`)
     );

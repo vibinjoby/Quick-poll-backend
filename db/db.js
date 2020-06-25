@@ -240,8 +240,6 @@ async function createPoll(pollType, pollsOutput, userId) {
 async function addPollOptionsImg(userId, optionsUrl, question_text) {
   const is_options_image = "Y";
 
-  console.log("inside");
-
   const options_img_urls = optionsUrl.reduce((acc, cur, i) => {
     acc[i + 1] = cur;
     return acc;
