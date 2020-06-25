@@ -151,18 +151,17 @@ async function getUserPolls(userId) {
  */
 async function deletePoll(pollId) {
   let polls = [];
-  const result = await Polls.findOne({ reference_id: pollId });
-
+  const result = await Polls.findOne({ _id: pollId });
   // Delete the initial poll reference
-  await Polls.findOneAndDelete(pollId);
+  await Polls.findOneAndDelete({ _id: pollId });
+
   if (result && result.poll_type === "text") {
     // Then delete the corresponding poll
-    polls = await TextPolls.findOneAndDelete(result.reference_id);
+    polls = await TextPolls.findOneAndDelete({ _id: result.reference_id });
   } else if (result && result.poll_type === "image") {
     // Code for handling image polls
-    polls = await ImagePolls.findOneAndDelete(result.reference_id);
+    polls = await ImagePolls.findOneAndDelete({ _id: result.reference_id });
   }
-  console.log(polls);
   return polls;
 }
 

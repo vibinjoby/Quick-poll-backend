@@ -7,9 +7,11 @@ const db = require("../db/db");
 router.get("/viewPublicPolls", auth, (_, res) => {
   db.fetchAllPolls()
     .then(result => {
-      res.render("polls", {
-        pollquestion: result[0]
-      });
+      result.length > 0
+        ? res.render("polls", {
+            pollquestion: result[0]
+          })
+        : res.render("nopolls");
     })
     .catch(err => {
       console.log(err);
