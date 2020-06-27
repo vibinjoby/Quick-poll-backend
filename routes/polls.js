@@ -33,7 +33,6 @@ router.get("/getMyPolls", auth, (req, res) => {
   const decodedUserObj = jwtDecode(token);
   db.getUserPolls(decodedUserObj._id)
     .then(result => {
-      console.log(result[0]);
       result.length > 0
         ? res.render("mypolls", { mypolls: result[0] })
         : res.render("nopolls");
@@ -85,7 +84,6 @@ router.get("/viewResult/:id", auth, (req, res) => {
     const promiseOutput = Promise.all(
       Object.keys(result.votes_per_options).map(options => {
         const votes = result.votes_per_options[options];
-        console.log(votes);
         //calculate the percentage of votes per each option and round off
         finalResult[options] =
           votes > 0 ? Math.ceil((votes / totalVotes) * 100) : 0;

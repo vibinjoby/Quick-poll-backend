@@ -10,4 +10,4 @@ each polls in pollquestion
                     p.card-text= polls.question_text
                 else
                     p.card-text= polls.question
-        button.join-poll-btn(onclick='navigateToPoll(\'' + polls._id + '\')') POLL NOW
+        button.join-poll-btn(onclick='navigateToPoll(\'' + polls._id + '\',\''+ polls.is_question_image +'\',\''+ polls.is_options_image +'\')') POLL NOW
