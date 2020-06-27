@@ -79,6 +79,7 @@ router.post("/vote", auth, (req, res) => {
 router.get("/viewResult/:id", auth, (req, res) => {
   //call the db and get the no of votes per options
   db.fetchVoteResults(req.params.id).then(result => {
+    if (!result) return res.status(400).send("Id not found");
     let finalResult = {};
     const totalVotes = result.no_of_votes;
     const promiseOutput = Promise.all(

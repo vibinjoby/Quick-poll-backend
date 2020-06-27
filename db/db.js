@@ -308,8 +308,8 @@ async function voteForPoll(pollId, optionChosen) {
 }
 
 async function fetchVoteResults(id) {
-  const pollData = await Polls.findById(id);
-  return pollData.poll_results;
+  const pollData = await Polls.findOne({ reference_id: id });
+  return pollData ? pollData.poll_results : null;
 }
 
 module.exports = {
