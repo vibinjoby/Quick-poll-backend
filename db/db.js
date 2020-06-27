@@ -75,6 +75,10 @@ async function createNewAccount(body) {
 
 /**
  * Function to fetch all the posts from db
+ * poll layout
+ * 0 ==> TEXT
+ * 1 ==> QUESTION IMAGE
+ * 2 ==> OPTION IMAGE
  */
 async function fetchAllPolls() {
   let allPolls = [];
@@ -91,6 +95,9 @@ async function fetchAllPolls() {
       } else {
         let imagePolls = await ImagePolls.findById(poll.reference_id);
         imagePolls.poll_type = "image";
+        imagePolls.is_options_image
+          ? (imagePolls.poll_layout_id = 1)
+          : (imagePolls.poll_layout_id = 2);
         allPolls.push(imagePolls);
       }
       return allPolls;

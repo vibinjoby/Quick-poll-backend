@@ -1,4 +1,5 @@
 each poll in mypolls
+    - var pollLayout = poll.is_options_image ? 2 : (poll.is_question_image ? 1 : 0);
     .card
         .delete-container
             a(data-toggle="modal" data-target="#deleteModal")
@@ -17,4 +18,4 @@ each poll in mypolls
                     p.card-text= poll.question_text
                 else
                     p.card-text= poll.question
-        button.join-poll-btn(onclick='navigateToPoll(\'' + poll._id + '\',\''+ poll.is_question_image +'\',\''+ poll.is_options_image +'\')') POLL NOW
+        button.join-poll-btn(onclick='navigateToPoll(\'' + poll._id + '\',\''+ pollLayout +'\')') POLL NOW
