@@ -66,7 +66,7 @@ router.post("/vote", auth, (req, res) => {
       );
   const { pollId, optionChosen } = req.body;
   db.voteForPoll(pollId, optionChosen)
-    .then(() => res.send("Vote registered"))
+    .then(() => res.send({ message: "Vote registered" }))
     .catch(err => {
       console.log(err);
       res
