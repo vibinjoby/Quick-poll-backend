@@ -23,7 +23,8 @@ router.post(
     }
   ]),
   (req, res) => {
-    if (!req.files) return res.status(400).send("No Files sent");
+    if (!req.files.question && !req.files.options)
+      return res.status(400).send("No Files sent");
     try {
       const token = req.header("x-auth-token");
       const decodedUserObj = jwtDecode(token);
@@ -38,10 +39,12 @@ router.post(
 
       //If question is an image then the options are text
       if (is_question_image && is_question_image.toUpperCase() === "Y") {
-        if (!options_text) {
+        if (!question_text || !options_text) {
           return res
             .status(400)
-            .send("options_text not sent in body when question is an image");
+            .send(
+              "question_text/options_text not sent in body when question is an image"
+            );
         }
         //If options is an image then the question is text
       } else if (is_options_image && is_options_image.toUpperCase() === "Y") {
@@ -165,7 +168,13 @@ const uploadImage = async (
   // Once the file is uploaded to AWS-S3 Bucket resolve the promise to see the url values and save it to DB
   Promise.all(result).then(() => {
     if (is_question_image)
-      db.addPollQuestionImg(userId, questionsUrl, options_text, is_private);
+      db.addPollQuestionImg(
+        userId,
+        questionsUrl,
+        question_text,
+        options_text,
+        is_private
+      );
     if (is_options_image)
       db.addPollOptionsImg(
         userId,

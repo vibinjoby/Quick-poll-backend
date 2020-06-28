@@ -184,6 +184,7 @@ async function deletePoll(pollId) {
 async function addPollQuestionImg(
   userId,
   questionsUrl,
+  question_text,
   options_text,
   is_private
 ) {
@@ -197,6 +198,7 @@ async function addPollQuestionImg(
   const imagePolls = await ImagePolls.create({
     is_question_image,
     question_img_url: questionsUrl,
+    question_text,
     options_text: options_text_obj
   });
 
