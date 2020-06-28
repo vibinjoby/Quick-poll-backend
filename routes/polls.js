@@ -77,23 +77,30 @@ router.post("/vote", auth, (req, res) => {
 
 router.get("/viewResult/:id", auth, (req, res) => {
   //call the db and get the no of votes per options
-  db.fetchVoteResults(req.params.id).then(result => {
-    if (!result) return res.status(400).send("Id not found");
-    let finalResult = {};
-    const totalVotes = result.no_of_votes;
-    const promiseOutput = Promise.all(
-      Object.keys(result.votes_per_options).map(options => {
-        const votes = result.votes_per_options[options];
-        //calculate the percentage of votes per each option and round off
-        finalResult[options] =
-          votes > 0 ? Math.ceil((votes / totalVotes) * 100) : 0;
-        return finalResult;
-      })
-    );
-    promiseOutput.then(data => {
-      res.send(data[0]);
+  db.fetchVoteResults(req.params.id)
+    .then(result => {
+      if (!result) return res.status(400).send("Id not found");
+      let finalResult = {};
+      const totalVotes = result.no_of_votes;
+      const promiseOutput = Promise.all(
+        Object.keys(result.votes_per_options).map(options => {
+          const votes = result.votes_per_options[options];
+          //calculate the percentage of votes per each option and round off
+          finalResult[options] =
+            votes > 0 ? Math.ceil((votes / totalVotes) * 100) : 0;
+          return finalResult;
+        })
+      );
+      promiseOutput.then(data => {
+        res.send(data[0]);
+      });
+    })
+    .catch(err => {
+      console.log(err);
+      res
+        .status(500)
+        .send(`Something went wrong with the server ${err.message}`);
     });
-  });
 });
 
 module.exports = router;

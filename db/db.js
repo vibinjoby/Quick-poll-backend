@@ -113,6 +113,7 @@ async function fetchAllPolls() {
 async function getPollQuestion(pollId) {
   let pollObj = {};
   const result = await Polls.findOne({ reference_id: pollId });
+  if (!result) throw new Error("Invalid pollId passed");
   if (result && result.poll_type === "text") {
     pollObj = await TextPolls.findOne({ _id: result.reference_id });
   } else if (result && result.poll_type === "image") {
@@ -131,6 +132,7 @@ async function getUserPolls(userId) {
   const polls = await Polls.find({
     created_by: userId
   });
+  if (!polls) throw new Error("Invalid userId passed");
 
   return Promise.all(
     polls.map(async poll => {
@@ -159,6 +161,7 @@ async function getUserPolls(userId) {
 async function deletePoll(pollId) {
   let polls = [];
   const result = await Polls.findOne({ _id: pollId });
+  if (!result) throw new Error("Invalid poll id passed");
   // Delete the initial poll reference
   result && (await Polls.findOneAndDelete({ _id: pollId }));
 
@@ -307,6 +310,7 @@ async function createTextPoll(userId, questionsText, optionsArr, is_private) {
 async function voteForPoll(pollId, optionChosen) {
   //Increment the no_of_votes and votes_per_options count
   const pollData = await Polls.findOne({ reference_id: pollId });
+  if (!pollData) throw new Error("Invalid poll id passed");
   pollData.poll_results.no_of_votes += 1;
   pollData.poll_results.votes_per_options[optionChosen] += 1;
   pollData.markModified("poll_results");
@@ -316,6 +320,7 @@ async function voteForPoll(pollId, optionChosen) {
 
 async function fetchVoteResults(id) {
   const pollData = await Polls.findOne({ reference_id: id });
+  if (!pollData) throw new Error("Invalid poll id passed");
   return pollData ? pollData.poll_results : null;
 }
 
