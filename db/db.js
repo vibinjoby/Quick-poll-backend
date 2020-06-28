@@ -306,7 +306,7 @@ async function createTextPoll(userId, questionsText, optionsArr, is_private) {
  */
 async function voteForPoll(pollId, optionChosen) {
   //Increment the no_of_votes and votes_per_options count
-  const pollData = await Polls.findById(pollId);
+  const pollData = await Polls.findOne({ reference_id: pollId });
   pollData.poll_results.no_of_votes += 1;
   pollData.poll_results.votes_per_options[optionChosen] += 1;
   pollData.markModified("poll_results");
