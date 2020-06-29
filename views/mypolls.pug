@@ -18,4 +18,4 @@ each poll in mypolls
                     p.card-text= poll.question_text
                 else
                     p.card-text= poll.question
-        button.join-poll-btn(onclick='navigateToPoll(\'' + poll._id + '\',\''+ pollLayout +'\')') POLL NOW
+        button.join-poll-btn(onclick='navigateToPoll(\'' + poll._id + '\',\''+ pollLayout +'\',\'result\')') VIEW RESULT
