@@ -4,6 +4,9 @@ each poll in mypolls
         .delete-container
             a(data-toggle="modal" data-target="#deleteModal")
                 img#delete-img(src='assets/images/trash.png', alt='delete image', onclick='updateDeletePollId(\'' + poll._id + '\')')
+            .copy-link-container
+                a
+                    img(src='assets/images/copy_link.png',alt='copy image',onclick='copyLink(\'' + poll._id + '\')')
         .card-header
             .circletag
                 if (poll.is_question_image)
