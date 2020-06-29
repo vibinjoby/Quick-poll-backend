@@ -160,10 +160,10 @@ async function getUserPolls(userId) {
  */
 async function deletePoll(pollId) {
   let polls = [];
-  const result = await Polls.findOne({ _id: pollId });
+  const result = await Polls.findOne({ reference_id: pollId });
   if (!result) throw new Error("Invalid poll id passed");
   // Delete the initial poll reference
-  result && (await Polls.findOneAndDelete({ _id: pollId }));
+  result && (await Polls.findOneAndDelete({ reference_id: pollId }));
 
   if (result && result.poll_type === "text") {
     // Then delete the corresponding poll
