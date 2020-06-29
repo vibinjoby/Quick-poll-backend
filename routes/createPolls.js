@@ -40,6 +40,9 @@ router.post(
       //If question is an image then the options are text
       if (is_question_image && is_question_image.toUpperCase() === "Y") {
         if (!question_text || !options_text) {
+          console.log(
+            "question_text/options_text not sent in body when question is an image"
+          );
           return res
             .status(400)
             .send(
@@ -49,6 +52,9 @@ router.post(
         //If options is an image then the question is text
       } else if (is_options_image && is_options_image.toUpperCase() === "Y") {
         if (!question_text || !options_text) {
+          console.log(
+            "question_text/options_text not sent in body when options is an image"
+          );
           return res
             .status(400)
             .send(
@@ -59,6 +65,9 @@ router.post(
           const options_text_obj = options_text.split(",");
 
           if (options_text_obj.length !== req.files.options.length) {
+            console.log(
+              "number of options in text is not equal to number of options image sent"
+            );
             return res
               .status(400)
               .send(
@@ -67,6 +76,9 @@ router.post(
           }
         }
       } else {
+        console.log(
+          "Incorrect request sent to server..Please provide either is_question_image/is_options_image flag in the request  "
+        );
         return res
           .status(400)
           .send(
@@ -189,6 +201,7 @@ const uploadImage = async (
 // For Text Poll
 router.post("/textPoll", auth, (req, res) => {
   try {
+    console.log(req.body);
     if (!req.body || !req.body.options || !req.body.question)
       return res.status(400).send("Invalid request sent to server");
 

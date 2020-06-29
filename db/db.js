@@ -4,7 +4,7 @@ const bcrypt = require("bcrypt");
 // prod-mode
 //${process.env.USERNAME}
 //${process.env.PASSWORD}
-const uri = `mongodb+srv://${process.env.USERNAME}:${process.env.PASSWORD}@cluster0-acs6q.mongodb.net/online_poll?retryWrites=true&w=majority`;
+const uri = `mongodb+srv://admin:admin@cluster0-acs6q.mongodb.net/online_poll?retryWrites=true&w=majority`;
 
 mongo
   .connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
