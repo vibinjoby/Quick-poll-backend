@@ -25,11 +25,11 @@ router.post(
   (req, res) => {
     console.log("req.files", req.files);
     try {
-      console.log("options", req.body);
+      console.log("options", req.params);
     } catch (err) {
       console.log(err);
     }
-    if (!req.files && !req.files.question && !req.files.options)
+    if (!req.files || (!req.files.question && !req.files.options))
       return res.status(400).send("No Files sent");
     try {
       const token = req.header("x-auth-token");
