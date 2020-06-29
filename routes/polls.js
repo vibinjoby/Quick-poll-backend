@@ -46,8 +46,8 @@ router.delete("/deletePoll/:id", auth, (req, res) => {
   const id = req.params.id;
   db.deletePoll(id)
     .then(result => {
-      result.length > 0 && res.send(result);
-      result.length == 0 &&
+      Object.keys(result).length > 0 && res.send(result);
+      Object.keys(result).length == 0 &&
         res.send(
           "No such poll present..Either the poll is deleted or the id is incorrect"
         );
