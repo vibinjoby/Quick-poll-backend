@@ -25,7 +25,7 @@ router.post(
   (req, res) => {
     console.log("req.files", req.files);
     try {
-      console.log("options", req.body.options);
+      console.log("options", req.body);
     } catch (err) {
       console.log(err);
     }
