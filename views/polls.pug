@@ -1,10 +1,7 @@
 each polls in pollquestion
     - var pollLayout = polls.is_options_image ? 2 : (polls.is_question_image ? 1 : 0);
     .card
-        if (polls.is_question_image)
-            img.card-img-top(src= polls.question_img_url, alt='Card image cap')
-        else 
-            img.card-img-top(src='/assets/images/polls-grid.png', alt='Card image cap')
+        img.card-img-top(src='/assets/images/polls-grid.png', alt='Card image cap')
         if polls.question_text || polls.question
             .card-body
                 if polls.question_text
