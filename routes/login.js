@@ -11,7 +11,7 @@ router.post("/", (req, res) => {
       return;
     }
     //process.env.JWT_PRIVATE_KEY
-    const token = jwt.sign(response, "gsfGSHshjYakkk");
+    const token = jwt.sign(response, process.env.JWT_PRIVATE_KEY);
     res.send(token);
   });
 });
